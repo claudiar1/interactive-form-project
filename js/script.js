@@ -1,5 +1,8 @@
 let roleSelector = document.getElementById("title");
 let otherRoleInput = document.getElementById("other-title");
+let colorSelector = document.getElementById("color");
+let designSelector = document.getElementById("design");
+let removedColorList = [];
 
 window.onload = function loadFocus() {
   document.getElementById("name").focus();
@@ -16,3 +19,26 @@ function showOtherRoleInput(e) {
 }
 
 roleSelector.addEventListener("change", showOtherRoleInput);
+
+function tShirtColor() {
+  let colorList = colorSelector.children;
+  let removedColor;
+  let message;
+  if (designSelector.value === "Select Theme") {
+    while (colorSelector.length > 0) {
+      removedColor = colorSelector.removeChild(colorList[0]);
+      removedColorList.push(removedColor);
+    }
+    message = document.createElement("option");
+    message.textContent = "Please select a T-shirt design";
+    colorSelector.appendChild(message);
+  } else {
+    colorSelector.removeChild(colorList[0]);
+    for (let i = 0; i < removedColorList.length; i += 1) {
+      colorSelector.appendChild(removedColorList[i]);
+    }
+  }
+}
+
+tShirtColor();
+designSelector.addEventListener("change", tShirtColor);
