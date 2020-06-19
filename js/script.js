@@ -2,7 +2,9 @@ let roleSelector = document.getElementById("title");
 let otherRoleInput = document.getElementById("other-title");
 let colorSelector = document.getElementById("color");
 let designSelector = document.getElementById("design");
-let removedColorList = [];
+let colorListDiv = document.getElementById("colors-js-puns");
+let puns = buildColorList("Puns");
+let heart = buildColorList("♥");
 
 window.onload = function loadFocus() {
   document.getElementById("name").focus();
@@ -20,23 +22,31 @@ function showOtherRoleInput(e) {
 
 roleSelector.addEventListener("change", showOtherRoleInput);
 
+function buildColorList(keyword) {
+  let colors = [];
+  for (let i = 0; i < colorSelector.length; i += 1) {
+    if (colorSelector[i].textContent.includes(keyword)) {
+      colors.push(colorSelector[i]);
+    }
+  }
+  return colors;
+}
+
+function showColorOptions(design) {
+  colorListDiv.style.visibility = "visible";
+  colorSelector.length = 0;
+  for (var i = 0; i < design.length; i += 1) {
+    colorSelector.appendChild(design[i]);
+  }
+}
+
 function tShirtColor() {
-  let colorList = colorSelector.children;
-  let removedColor;
-  let message;
   if (designSelector.value === "Select Theme") {
-    while (colorSelector.length > 0) {
-      removedColor = colorSelector.removeChild(colorList[0]);
-      removedColorList.push(removedColor);
-    }
-    message = document.createElement("option");
-    message.textContent = "Please select a T-shirt design";
-    colorSelector.appendChild(message);
-  } else {
-    colorSelector.removeChild(colorList[0]);
-    for (let i = 0; i < removedColorList.length; i += 1) {
-      colorSelector.appendChild(removedColorList[i]);
-    }
+    colorListDiv.style.visibility = "hidden";
+  } else if (designSelector.value === "js puns") {
+    showColorOptions(puns);
+  } else if (designSelector.value === "heart js") {
+    showColorOptions(heart);
   }
 }
 
