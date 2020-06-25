@@ -16,6 +16,10 @@ let checkboxList = document.querySelectorAll("[type=checkbox");
 let sections = document.getElementsByTagName("fieldset");
 let buttons = document.getElementsByTagName("button");
 let submitButton = buttons[0];
+let creditCardNumber = document.getElementById("cc-num");
+let zipInput = document.getElementById("zip");
+cvvInput = document.getElementById("cvv");
+let errorMessageCounter = 0;
 
 window.onload = function loadFocus() {
   document.getElementById("name").focus();
@@ -148,20 +152,19 @@ function activitiesValidation() {
   }
 }
 
-function cardNumberValidation(cardNumber) {
+function cardNumberRegex(cardNumber) {
   return /^\d{13,16}$/.test(cardNumber);
 }
 
-function zipValidation(zip) {
+function zipRegex(zip) {
   return /^\d{5}$/.test(zip);
 }
 
-function cvvValidation(cvv) {
+function cvvRegex(cvv) {
   return /^\d{3}$/.test(cvv);
 }
 
-function formValidation(e) {
-  e.preventDefault();
+function formValidation() {
   let nameField = document.getElementById("name");
   let emailField = document.getElementById("mail");
   let bioInfo = sections[0];
@@ -176,11 +179,9 @@ function formValidation(e) {
     nameMessage.id = "nameError";
     nameField.className = "error";
     bioInfo.insertBefore(nameMessage, nameField.nextElementSibling);
-  } else {
+  } else if (nameValidation(nameField.value) && nameErrorPresent !== null) {
     nameField.className = "";
-    if (nameErrorPresent !== null) {
-      bioInfo.removeChild(nameErrorPresent);
-    }
+    bioInfo.removeChild(nameErrorPresent);
   }
 
   if (
@@ -194,11 +195,9 @@ function formValidation(e) {
     emailMessage.id = "emailError";
     emailField.className = "error";
     bioInfo.insertBefore(emailMessage, emailField.nextElementSibling);
-  } else {
+  } else if (emailValidation(emailField.value) && emailErrorPresent !== null) {
     emailField.className = "";
-    if (emailErrorPresent !== null) {
-      bioInfo.removeChild(emailErrorPresent);
-    }
+    bioInfo.removeChild(emailErrorPresent);
   }
 
   if (activitiesValidation() === false && activitiesErrorPresent === null) {
@@ -211,10 +210,152 @@ function formValidation(e) {
       activitiesMessage,
       activitiesTitle.nextElementSibling
     );
-  } else {
-    if (activitiesErrorPresent !== null) {
-      activitiesSection[0].removeChild(activitiesErrorPresent);
+  } else if (activitiesValidation() && activitiesErrorPresent !== null) {
+    activitiesSection[0].removeChild(activitiesErrorPresent);
+  }
+
+  let emailErrorPresentNow = document.getElementById("emailError");
+  let nameErrorPresentNow = document.getElementById("nameError");
+  let activitiesErrorPresentNow = document.getElementById("activitiesError");
+  if (
+    nameErrorPresentNow !== null ||
+    emailErrorPresentNow !== null ||
+    activitiesErrorPresentNow !== null
+  ) {
+    return false;
+  }
+  return true;
+}
+
+function cardNumberValidation() {
+  let cardNumberMessage = document.createElement("p");
+  cardNumberMessage.className = "error-message";
+  cardNumberMessage.id = "cardNumberError";
+  let cardNumberMessagePresent = document.getElementById("cardNumberError");
+  let cardNumberParent = document.getElementById("card-number");
+  if (
+    cardNumberRegex(creditCardNumber.value) === false &&
+    creditCardNumber.value.length === 0
+  ) {
+    if (cardNumberMessagePresent === null) {
+      creditCardNumber.className = "error";
+      cardNumberMessage.textContent = "Please enter a credit card number.";
+      cardNumberParent.insertBefore(
+        cardNumberMessage,
+        creditCardNumber.nextElementSibling
+      );
+    } else if (cardNumberMessagePresent !== null) {
+      creditCardNumber.className = "error";
+      cardNumberParent.removeChild(cardNumberMessagePresent);
+      cardNumberMessage.textContent = "Please enter a credit card number.";
+      cardNumberParent.insertBefore(
+        cardNumberMessage,
+        creditCardNumber.nextElementSibling
+      );
     }
+  } else if (
+    cardNumberRegex(creditCardNumber.value) === false &&
+    creditCardNumber.value.length > 0
+  ) {
+    if (cardNumberMessagePresent !== null) {
+      creditCardNumber.className = "error";
+      cardNumberParent.removeChild(cardNumberMessagePresent);
+      cardNumberMessage.textContent =
+        "Please enter a number that is between 13 and 16 digits long.";
+      cardNumberParent.insertBefore(
+        cardNumberMessage,
+        creditCardNumber.nextElementSibling
+      );
+    } else {
+      creditCardNumber.className = "error";
+      cardNumberMessage.textContent =
+        "Please enter a number that is between 13 and 16 digits long.";
+      cardNumberParent.insertBefore(
+        cardNumberMessage,
+        creditCardNumber.nextElementSibling
+      );
+    }
+  } else if (
+    cardNumberRegex(creditCardNumber.value) &&
+    cardNumberMessagePresent !== null
+  ) {
+    creditCardNumber.className = "";
+    cardNumberParent.removeChild(cardNumberMessagePresent);
+  }
+  let cardNumberMessagePresentNow = document.getElementById("cardNumberError");
+
+  if (cardNumberMessagePresent !== null) {
+    return false;
+  }
+  return true;
+}
+
+function zipValidation() {
+  let zipMessage = document.createElement("p");
+  zipMessage.className = "error-message";
+  zipMessage.id = "zipError";
+  let zipMessagePresent = document.getElementById("zipError");
+  let zipInputParent = document.getElementById("zip-code");
+  if (zipRegex(zipInput.value) === false) {
+    zipInput.className = "error";
+    zipMessage.textContent = "Please enter your 5 digit billing zip code.";
+    if (zipMessagePresent === null) {
+      zipInputParent.insertBefore(zipMessage, zipInput.nextElementSibling);
+    } else if (zipMessagePresent !== null) {
+      zipInputParent.removeChild(zipMessagePresent);
+      zipInputParent.insertBefore(zipMessage, zipInput.nextElementSibling);
+    }
+  } else if (zipRegex(zipInput.value) && zipMessagePresent !== null) {
+    zipInput.className = "";
+    zipInputParent.removeChild(zipMessagePresent);
+  }
+
+  let zipMessagePresentNow = document.getElementById("zipError");
+
+  if (zipMessagePresentNow !== null) {
+    return false;
+  }
+  return true;
+}
+
+function cvvValidation() {
+  let cvvMessage = document.createElement("p");
+  cvvMessage.className = "error-message";
+  cvvMessage.id = "cvvError";
+  let cvvMessagePresent = document.getElementById("cvvError");
+  let cvvInputParent = document.getElementById("cvv-input");
+  if (cvvRegex(cvvInput.value) === false) {
+    cvvInput.className = "error";
+    cvvMessage.textContent = "Please enter your card's 3 digit CVV.";
+    if (cvvMessagePresent === null) {
+      cvvInputParent.appendChild(cvvMessage);
+    } else if (cvvMessagePresent !== null) {
+      cvvInputParent.removeChild(cvvMessagePresent);
+      cvvInputParent.appendChild(cvvMessage);
+    }
+  } else if (cvvRegex(cvvInput.value) && cvvMessagePresent !== null) {
+    cvvInput.className = "";
+    cvvInputParent.removeChild(cvvMessagePresent);
+  }
+  let cvvMessagePresentNow = document.getElementById("cvvError");
+
+  if (cvvMessagePresentNow !== null) {
+    return false;
+  }
+  return true;
+}
+
+function submitValidation(e) {
+  let form = formValidation();
+  let card = cardNumberValidation();
+  let zip = zipValidation();
+  let cvv = cvvValidation();
+  if (form === false || card === false || zip === false || cvv === false) {
+    e.preventDefault();
   }
 }
-submitButton.addEventListener("click", formValidation);
+
+creditCardNumber.addEventListener("keyup", cardNumberValidation);
+zipInput.addEventListener("keyup", zipValidation);
+cvvInput.addEventListener("keyup", cvvValidation);
+submitButton.addEventListener("click", submitValidation);
