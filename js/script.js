@@ -21,6 +21,9 @@ let zipInput = document.getElementById("zip");
 cvvInput = document.getElementById("cvv");
 let errorMessageCounter = 0;
 
+/**
+ * Places focus on name field and removes "select payment method" optionm, thereby setting "credit card" as the default upon page load.
+ */
 window.onload = function loadFocus() {
   document.getElementById("name").focus();
   selectPaymentMethod.removeChild(selectPaymentMethod.firstElementChild);
@@ -29,6 +32,11 @@ window.onload = function loadFocus() {
 
 otherRoleInput.style.visibility = "hidden";
 
+/**
+ * Provides text input box for user to specify their role if "other" is selected.
+ *
+ * @param {event} e - used to specify the event target in order to get the value of the user's selection.
+ */
 function showOtherRoleInput(e) {
   if (e.target.value === "other") {
     otherRoleInput.style.visibility = "visible";
@@ -39,6 +47,11 @@ function showOtherRoleInput(e) {
 
 roleSelector.addEventListener("change", showOtherRoleInput);
 
+/**
+ * buildColorList compiles a list of all of the "I heart JS" shirts and a list of all of the "JS Puns" shirts, stored in variables.
+ *
+ * @param {string} keyword - if shirt color choice contains a given keyword, that shirt color choice is added to an array of shirt color choices that also contain the given keyword.
+ */
 function buildColorList(keyword) {
   let colors = [];
   for (let i = 0; i < colorSelector.length; i += 1) {
@@ -49,6 +62,11 @@ function buildColorList(keyword) {
   return colors;
 }
 
+/**
+ * showColorOptions sets the color selector to visible, and adds to it the availble color options for a given shirt design.
+ *
+ * @param {array} design - an array of the available shirt color options for a given shirt design.
+ */
 function showColorOptions(design) {
   colorListDiv.style.visibility = "visible";
   colorSelector.length = 0;
@@ -57,6 +75,9 @@ function showColorOptions(design) {
   }
 }
 
+/**
+ * tShirtColor only shows the color selector when a design has been selected by the user, and then only shows the color options that correspond with the selected design.
+ */
 function tShirtColor() {
   if (designSelector.value === "Select Theme") {
     colorListDiv.style.visibility = "hidden";
@@ -70,6 +91,9 @@ function tShirtColor() {
 tShirtColor();
 designSelector.addEventListener("change", tShirtColor);
 
+/**
+ * Totals the cost of the user's selected activities and displays this cost below the list of activities and does not allow a user to select activities with conflicting days and times.
+ */
 activitiesSection[0].addEventListener("change", e => {
   let checkbox = e.target;
   let cost = parseInt(checkbox.dataset.cost);
@@ -109,6 +133,12 @@ activitiesSection[0].addEventListener("change", e => {
   }
 });
 
+/**
+ * removePaymentSections is used to remove the payment information that is not relevant to the user's selected payment method.
+ *
+ * @param {node} sectionOne - a given HTML node to remove from the DOM.
+ * @param {node} sectionTwo - a second given HTML node to remove from the DOM.
+ */
 function removePaymentSections(sectionOne, sectionTwo) {
   let paymentFieldset = sections[3];
   paymentFieldset.appendChild(creditCard);
@@ -118,6 +148,9 @@ function removePaymentSections(sectionOne, sectionTwo) {
   paymentFieldset.removeChild(sectionTwo);
 }
 
+/**
+ * paymentSection removes specific payment sections depending upon the user's selected payment method.
+ */
 function paymentSection() {
   if (selectPaymentMethod.value === "credit card") {
     removePaymentSections(paypal, bitcoin);
@@ -130,14 +163,27 @@ function paymentSection() {
 
 selectPaymentMethod.addEventListener("change", paymentSection);
 
+/**
+ * Validates that the user has entered a first and last name.
+ *
+ * @param {string} name - user's input
+ */
 function nameValidation(name) {
   return /^[A-Za-z]+ [A-Za-z]+$/.test(name);
 }
 
+/**
+ * Validates that user has entered a correctly formatted email address.
+ *
+ * @param {string} email - user's input
+ */
 function emailValidation(email) {
   return /^\w+@\w+\.\w+/i.test(email);
 }
 
+/**
+ * Checks that user has checked off at least one activity.
+ */
 function activitiesValidation() {
   let checkedOffBoxes = [];
   for (let i = 0; i < checkboxList.length; i += 1) {
@@ -152,18 +198,36 @@ function activitiesValidation() {
   }
 }
 
+/**
+ * Checks that user has entered a credit card number between 13 and 16 digits long.
+ *
+ * @param {string} cardNumber - user's input
+ */
 function cardNumberRegex(cardNumber) {
   return /^\d{13,16}$/.test(cardNumber);
 }
 
+/**
+ * Checks that user has entered a 5 digit zip code.
+ *
+ * @param {string} zip - user's input
+ */
 function zipRegex(zip) {
   return /^\d{5}$/.test(zip);
 }
 
+/**
+ * Checks that user has entered 3 digit CVV.
+ *
+ * @param {string} cvv - user's input
+ */
 function cvvRegex(cvv) {
   return /^\d{3}$/.test(cvv);
 }
 
+/**
+ * Checks if user has completed the name, email, and activities fields and, if not, displays error messages.
+ */
 function formValidation() {
   let nameField = document.getElementById("name");
   let emailField = document.getElementById("mail");
@@ -227,6 +291,9 @@ function formValidation() {
   return true;
 }
 
+/**
+ * Checks that user has fully completed the credit card number field, and if not, provides conditional error messages.
+ */
 function cardNumberValidation() {
   let cardNumberMessage = document.createElement("p");
   cardNumberMessage.className = "error-message";
@@ -290,6 +357,9 @@ function cardNumberValidation() {
   return true;
 }
 
+/**
+ * Checks if user has completed the zip code field and, if not, displays error message.
+ */
 function zipValidation() {
   let zipMessage = document.createElement("p");
   zipMessage.className = "error-message";
@@ -318,6 +388,9 @@ function zipValidation() {
   return true;
 }
 
+/**
+ * Checks that user has completed the CVV field, and, if not, displays an error message.
+ */
 function cvvValidation() {
   let cvvMessage = document.createElement("p");
   cvvMessage.className = "error-message";
@@ -345,11 +418,22 @@ function cvvValidation() {
   return true;
 }
 
+/**
+ * Checks all necessary validations.
+ *
+ * @param {event} e - passed the event it's called on in order to prevent its default action
+ */
 function submitValidation(e) {
+  let card;
+  let zip;
+  let cvv;
   let form = formValidation();
-  let card = cardNumberValidation();
-  let zip = zipValidation();
-  let cvv = cvvValidation();
+  if (selectPaymentMethod.value === "credit card") {
+    card = cardNumberValidation();
+    zip = zipValidation();
+    cvv = cvvValidation();
+  }
+
   if (form === false || card === false || zip === false || cvv === false) {
     e.preventDefault();
   }
